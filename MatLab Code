@@ -1,0 +1,49 @@
+
+clear; clc; close all;
+
+portName = 'COM5';  % portul meu este COM5
+baudRate = 115200;
+
+delete(serialportfind); % sterge orice conexiune (inclusiv cea din Command Window)
+delete(instrfind);      % sterge si conexiunile vechi
+
+pause(2); 
+
+disp(['Încerc conectarea la ', portName, '...']);
+
+s = serialport(portName, baudRate);%creez conexiunea cu portul astfel incat sa conectez matlab cu esp32
+
+configureTerminator(s, "CR/LF");%setez terminatorul ca sa nu se blocheze compilerul
+flush(s);%curatarea bufferelor reziduale
+disp('CONECTAT CU SUCCES!');
+
+%pregatire grafic
+%creez un tab figure cu nume si culoare
+fig = figure('Name', 'Monitorizare LED', 'Color', 'w');
+hLine = animatedline('Color', 'b', 'LineWidth', 2);%folosesc animatedline pt un plot live 
+ax = gca; ax.YLim = [-0.2 3]; grid on;%setarea gridului si a axelor
+%desi axa y in mod normal este cuprinsa intre 0 si 3.3 am adaugat pur estetic
+%o marja de 0.2 pe negativ ca sa nu fie lipita linia de figure si pe
+%pozitiv am limitat la 3 pentru ca, masurand cu multimetrul am observat
+%faptul ca tensiunea ledului se duce doar pana la 2.8-2.9V
+
+setappdata(fig, 'running', 1);
+
+x = 0;
+while getappdata(fig, 'running')% cat timp figure se misca
+    dataLine = readline(s);%citeste din sirul de seriala
+    val = str2double(dataLine); %converteste caracterul in numar real
+
+    if ~isnan(val)%daca valoarea este un numar
+        x = x + 1;
+        addpoints(hLine, x, val);%adauga puncte, pe punctul x se adauga o noua valoare 0 sau 1 
+        drawnow limitrate;%actualizarea-figure ului live si limitarea fps urilor
+        
+        if x > 100
+             ax.XLim = [x-100 x];%cu comanda asta se pot vedea doar ultimele 100 de puncte pt ca ajustez axa x de la 1 la 100 practic
+        end
+    end
+end
+
+delete(s);%sterg incarcarea seriala
+disp('Gata.');
