@@ -36,7 +36,7 @@ The principle is simple. The transistor functions like a variable resistor in th
 <h2>Pictures and Videos of the Project</h2>
 
 <p align="center">
-  Watch video:  (https://i.imgur.com/cGBeD3s.jpg)](https://i.imgur.com/cGBeD3s.mp4)
+  Watch video:  (https://imgur.com/6ANyvya)
 
  <br/>
 <img src="https://imgur.com/Uz5EIL0.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
